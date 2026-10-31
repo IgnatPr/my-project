@@ -1,0 +1,802 @@
+ 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f8fa">
+    <title>Истинный белорус — Гастрономический тест</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blueberry: '#0072BC',
+                        terracotta: '#C94C45',
+                        ink: '#202A38',
+                        soft: '#F7F8FA'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f7f8fa;
+            color: #202a38;
+            font-family: 'Inter', Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        .ornament {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            opacity: .07;
+            pointer-events: none;
+        }
+
+        .ornament svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #edf0f4;
+            border-radius: 26px;
+            box-shadow: 0 15px 50px rgba(31, 45, 61, .055);
+        }
+
+        .primary-btn {
+            background: #0072BC;
+            color: white;
+            transition: .25s ease;
+        }
+
+        .primary-btn:hover {
+            background: #005d9b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 114, 188, .2);
+        }
+
+        .answer {
+            width: 100%;
+            text-align: left;
+            padding: 17px 19px;
+            border: 1.5px solid #e8edf2;
+            border-radius: 15px;
+            background: white;
+            transition: all .2s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+
+        .answer:hover:not(:disabled) {
+            border-color: #0072BC;
+            background: #f4f9fd;
+            transform: translateY(-2px);
+        }
+
+        .answer:disabled {
+            cursor: default;
+        }
+
+        .answer.correct {
+            border-color: #22a06b;
+            background: #eaf8f1;
+            color: #16794e;
+        }
+
+        .answer.wrong {
+            border-color: #d94b4b;
+            background: #fff0f0;
+            color: #bd3434;
+        }
+
+        .answer-letter {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+            background: #f0f3f7;
+            color: #637083;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .correct .answer-letter {
+            background: #22a06b;
+            color: white;
+        }
+
+        .wrong .answer-letter {
+            background: #d94b4b;
+            color: white;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0072BC, #42a6dc);
+            border-radius: 99px;
+            transition: width .45s ease;
+        }
+
+        .fade-in {
+            animation: appear .4s ease both;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-icon {
+            width: 104px;
+            height: 104px;
+            border-radius: 32px;
+            display: grid;
+            place-items: center;
+            font-size: 48px;
+            margin: 0 auto;
+        }
+
+        .hidden-screen {
+            display: none !important;
+        }
+
+        @media(max-width: 640px) {
+            .card {
+                border-radius: 21px;
+            }
+
+            .answer {
+                padding: 14px;
+                font-size: 14px;
+            }
+
+            .ornament {
+                width: 95px;
+                height: 95px;
+            }
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Decorative ornaments -->
+    <div class="ornament top-5 left-3 text-blueberry">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M50 5 L50 95 M5 50 L95 50 M15 15 L85 85 M85 15 L15 85"/>
+            <path d="M50 5 L60 20 L50 35 L40 20 Z"/>
+            <path d="M50 65 L60 80 L50 95 L40 80 Z"/>
+        </svg>
+    </div>
+
+    <div class="ornament bottom-5 right-3 text-terracotta">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M50 5 L50 95 M5 50 L95 50"/>
+            <path d="M50 15 L65 30 L50 45 L35 30 Z"/>
+            <path d="M50 55 L65 70 L50 85 L35 70 Z"/>
+        </svg>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10 px-5 py-5">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blueberry text-white flex items-center justify-center font-bold text-lg">
+                    Б
+                </div>
+                <div>
+                    <div class="font-extrabold text-sm tracking-wide">ИСТИННЫЙ БЕЛОРУС</div>
+                    <div class="text-xs text-gray-400">Гастрономический тест</div>
+                </div>
+            </div>
+
+            <div class="text-xs font-semibold text-gray-400 tracking-wider">
+                БЕЛАРУСЬ • 2026
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-2xl mx-auto px-4 pt-8 pb-16">
+
+        <!-- START SCREEN -->
+        <section id="startScreen" class="card p-7 sm:p-12 text-center fade-in">
+
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blueberry text-xs font-bold mb-8">
+                <span>🇧🇾</span>
+                <span>УЗНАЙ СВОЮ БЕЛОРУССКОСТЬ</span>
+            </div>
+
+            <div class="text-6xl mb-6">🥔</div>
+
+            <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight mb-5">
+                Тест: <span class="text-blueberry">Истинный</span>
+                <span class="text-terracotta">белорус?</span>
+            </h1>
+
+            <p class="text-gray-500 leading-relaxed text-sm sm:text-base max-w-md mx-auto mb-9">
+                Проверь, насколько хорошо ты знаешь вкусы,
+                культуру и традиции родной земли!
+                От знаменитых клёцок до легендарных сморгонских баранок.
+            </p>
+
+            <div class="flex justify-center gap-5 mb-9 text-xs text-gray-400 font-medium">
+                <div class="flex items-center gap-2">
+                    <span>❓</span> 10 вопросов
+                </div>
+                <div class="flex items-center gap-2">
+                    <span>⏱</span> 3 минуты
+                </div>
+                <div class="flex items-center gap-2">
+                    <span>🏆</span> 3 результата
+                </div>
+            </div>
+
+            <button onclick="startTest()"
+                class="primary-btn w-full sm:w-auto px-12 py-4 rounded-2xl font-bold text-base">
+                Начать тест →
+            </button>
+
+            <p class="mt-7 text-xs text-gray-400">
+                10 вопросов • 1 правильный ответ • 1 возможность доказать!
+            </p>
+        </section>
+
+
+        <!-- QUIZ SCREEN -->
+        <section id="quizScreen" class="hidden-screen fade-in">
+
+            <!-- Progress -->
+            <div class="mb-7">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-bold text-gray-600" id="questionCounter">
+                        Вопрос 1 из 10
+                    </span>
+
+                    <span class="text-sm font-bold text-blueberry" id="progressPercent">
+                        10%
+                    </span>
+                </div>
+
+                <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="progressBar" class="progress-fill" style="width:10%"></div>
+                </div>
+            </div>
+
+            <!-- Question card -->
+            <div class="card p-6 sm:p-9">
+
+                <div class="flex items-center justify-between mb-7">
+                    <span class="text-xs uppercase tracking-widest font-bold text-terracotta">
+                        БЕЛОРУССКАЯ ГАСТРОНОМИЯ
+                    </span>
+
+                    <span class="text-2xl">🍽️</span>
+                </div>
+
+                <div id="questionContent" class="fade-in">
+                    <h2 id="questionText"
+                        class="text-xl sm:text-2xl font-extrabold leading-snug mb-8">
+                    </h2>
+
+                    <div id="answersContainer" class="space-y-3">
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div id="feedback" class="hidden mt-6 p-4 rounded-xl text-sm font-semibold">
+                </div>
+
+                <div class="mt-8 flex justify-between items-center">
+                    <span class="text-xs text-gray-400">
+                        Выбери один вариант ответа
+                    </span>
+
+                    <span class="text-xs font-bold text-gray-300" id="questionNumber">
+                        01 / 10
+                    </span>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- RESULT SCREEN -->
+        <section id="resultScreen" class="hidden-screen card p-7 sm:p-12 text-center fade-in">
+
+            <div class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-7">
+                ТВОЙ РЕЗУЛЬТАТ
+            </div>
+
+            <div id="resultIcon" class="result-icon mb-7">
+                🏆
+            </div>
+
+            <div class="text-sm text-gray-400 font-semibold mb-2">
+                Правильных ответов
+            </div>
+
+            <div class="flex justify-center items-baseline gap-2 mb-6">
+                <span id="finalScore" class="text-6xl font-extrabold text-blueberry">
+                    0
+                </span>
+                <span class="text-2xl text-gray-300 font-bold">/ 10</span>
+            </div>
+
+            <div class="w-full h-2 bg-gray-100 rounded-full mb-8 overflow-hidden">
+                <div id="resultBar" class="progress-fill" style="width:0%"></div>
+            </div>
+
+            <h2 id="resultTitle" class="text-2xl sm:text-3xl font-extrabold mb-4">
+                Истинный белорус!
+            </h2>
+
+            <p id="resultDescription"
+                class="text-gray-500 leading-relaxed text-sm sm:text-base max-w-md mx-auto mb-9">
+            </p>
+
+            <div class="border-t border-gray-100 pt-7 mb-8">
+                <div class="text-2xl mb-2">🇧🇾</div>
+                <p class="text-xs text-gray-400">
+                    Беларусь — это не просто место на карте.
+                    Это вкус, история и традиции!
+                </p>
+            </div>
+
+            <button onclick="startTest()"
+                class="primary-btn w-full sm:w-auto px-12 py-4 rounded-2xl font-bold">
+                ↻ Пройти заново
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="relative z-10 text-center px-5 pb-8">
+        <div class="w-12 h-1 rounded-full bg-gray-200 mx-auto mb-4"></div>
+        <p class="text-xs text-gray-400">
+            Зроблена з любоўю да Беларусі ❤️
+        </p>
+        <p class="text-xs text-gray-300 mt-2">
+            Истинный белорус © 2026
+        </p>
+    </footer>
+
+
+    <script>
+
+        // ==========================================
+        // DATABASE: QUESTIONS
+        // ==========================================
+
+        const questions = [
+
+            {
+                question: 'Что скрывает в себе знаменитая глубокская клёцка «с душой»?',
+                answers: [
+                    'Мясную, шкварковую или грибную начинку внутри картофельного теста',
+                    'Секретный ингредиент, который повара держат в тайне',
+                    'Сгущенное молоко'
+                ],
+                correct: 0
+            },
+
+            {
+                question: 'Какой город Беларуси прославился на всю страну своим культовым стритфудом — вафлями «Лодочками»?',
+                answers: [
+                    'Гродно',
+                    'Барановичи',
+                    'Могилев'
+                ],
+                correct: 1
+            },
+
+            {
+                question: 'Какое культовое кондитерское изделие прославило город Бобруйск?',
+                answers: [
+                    'Шоколадные конфеты',
+                    'Овсяное печенье',
+                    'Нежнейший зефир'
+                ],
+                correct: 2
+            },
+
+            {
+                question: 'Из чего исторически готовится знаменитый согревающий белорусский суп Жур?',
+                answers: [
+                    'На чистом свекольном соке',
+                    'На сброженной овсяной закваске',
+                    'На березовом квасу'
+                ],
+                correct: 1
+            },
+
+            {
+                question: 'Какое блюдо традиционно подают вместе с пышными блинами для макания?',
+                answers: [
+                    'Бабку в горшочке',
+                    'Холодник',
+                    'Мачанку или Верещаку'
+                ],
+                correct: 2
+            },
+
+            {
+                question: 'Какой овощ стал неофициальным символом города Шклов, удостоившись даже памятника в центре?',
+                answers: [
+                    'Картофель',
+                    'Огурец',
+                    'Томат'
+                ],
+                correct: 1
+            },
+
+            {
+                question: 'Где в Беларуси производят элитные сыры (моцареллу, качотту), которые конкурируют с итальянскими благодаря полесским лугам?',
+                answers: [
+                    'Полоцк',
+                    'Лида',
+                    'Туров'
+                ],
+                correct: 2
+            },
+
+            {
+                question: 'В каком регионе Беларуси можно попробовать знаменитую сдобную плетенку «Бацькава булка» по старинным рецептам?',
+                answers: [
+                    'Свислочь',
+                    'Браслав',
+                    'Пинск'
+                ],
+                correct: 0
+            },
+
+            {
+                question: 'Чем знамениты исторические сморгонские «обваранки» (баранки)?',
+                answers: [
+                    'Их выпекали исключительно квадратной формы',
+                    'Их брали в дорогу дрессировщики медведей из «Сморгонской академии»',
+                    'Это были самые острые баранки в Европе'
+                ],
+                correct: 1
+            },
+
+            {
+                question: 'Какое из этих блюд является главным летним холодным супом Беларуси?',
+                answers: [
+                    'Горячая уха',
+                    'Крупник',
+                    'Холодник на кефире и свекле'
+                ],
+                correct: 2
+            }
+
+        ];
+
+
+        // ==========================================
+        // VARIABLES
+        // ==========================================
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let nextTimeout = null;
+
+        const letters = ['А', 'Б', 'В'];
+
+
+        // ==========================================
+        // SCREEN MANAGEMENT
+        // ==========================================
+
+        function showScreen(screenId) {
+
+            document.getElementById('startScreen')
+                .classList.add('hidden-screen');
+
+            document.getElementById('quizScreen')
+                .classList.add('hidden-screen');
+
+            document.getElementById('resultScreen')
+                .classList.add('hidden-screen');
+
+            document.getElementById(screenId)
+                .classList.remove('hidden-screen');
+
+        }
+
+
+        // ==========================================
+        // START TEST
+        // ==========================================
+
+        function startTest() {
+
+            clearTimeout(nextTimeout);
+
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+
+            showScreen('quizScreen');
+
+            renderQuestion();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+        }
+
+
+        // ==========================================
+        // RENDER QUESTION
+        // ==========================================
+
+        function renderQuestion() {
+
+            answered = false;
+
+            const q = questions[currentQuestion];
+
+            const questionContent = document.getElementById('questionContent');
+
+            questionContent.classList.remove('fade-in');
+
+            // Restart animation
+            void questionContent.offsetWidth;
+
+            questionContent.classList.add('fade-in');
+
+            // Update progress
+            const progress = Math.round(
+                ((currentQuestion + 1) / questions.length) * 100
+            );
+
+            document.getElementById('questionCounter').textContent =
+                `Вопрос ${currentQuestion + 1} из ${questions.length}`;
+
+            document.getElementById('progressPercent').textContent =
+                `${progress}%`;
+
+            document.getElementById('progressBar').style.width =
+                `${progress}%`;
+
+            document.getElementById('questionNumber').textContent =
+                `${String(currentQuestion + 1).padStart(2, '0')} / 10`;
+
+            // Update question text
+            document.getElementById('questionText').textContent =
+                q.question;
+
+            // Clear old answers
+            const container =
+                document.getElementById('answersContainer');
+
+            container.innerHTML = '';
+
+            document.getElementById('feedback').classList.add('hidden');
+
+            // Shuffle answers without modifying the database
+            const shuffledAnswers = q.answers.map((answer, index) => ({
+                text: answer,
+                originalIndex: index
+            }));
+
+            shuffledAnswers.sort(() => Math.random() - 0.5);
+
+            // Create answer buttons
+            shuffledAnswers.forEach((answer, index) => {
+
+                const button = document.createElement('button');
+
+                button.className = 'answer';
+
+                button.innerHTML = `
+                    <span class="answer-letter">${letters[index]}</span>
+                    <span class="font-medium leading-snug">${answer.text}</span>
+                `;
+
+                button.onclick = () => selectAnswer(
+                    answer.originalIndex,
+                    button
+                );
+
+                container.appendChild(button);
+
+            });
+
+        }
+
+
+        // ==========================================
+        // CHECK ANSWER
+        // ==========================================
+
+        function selectAnswer(selectedIndex, selectedButton) {
+
+            if (answered) return;
+
+            answered = true;
+
+            const q = questions[currentQuestion];
+
+            const buttons =
+                document.querySelectorAll('.answer');
+
+            const feedback =
+                document.getElementById('feedback');
+
+            const isCorrect = selectedIndex === q.correct;
+
+            // Disable all buttons
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+
+            // Highlight correct answer
+            buttons.forEach(button => {
+
+                const buttonText =
+                    button.querySelector('span:last-child').textContent;
+
+                const correctText =
+                    q.answers[q.correct];
+
+                if (buttonText === correctText) {
+                    button.classList.add('correct');
+
+                    const letter =
+                        button.querySelector('.answer-letter');
+
+                    letter.textContent = '✓';
+                }
+
+            });
+
+            if (isCorrect) {
+
+                score++;
+
+                feedback.className =
+                    'mt-6 p-4 rounded-xl text-sm font-semibold bg-green-50 text-green-700';
+
+                feedback.textContent =
+                    '✓ Правильно! Отличное знание белорусских традиций!';
+
+            } else {
+
+                selectedButton.classList.add('wrong');
+
+                selectedButton.querySelector('.answer-letter')
+                    .textContent = '✕';
+
+                feedback.className =
+                    'mt-6 p-4 rounded-xl text-sm font-semibold bg-red-50 text-red-700';
+
+                feedback.textContent =
+                    '✕ Не совсем! Правильный ответ подсвечен зелёным.';
+
+            }
+
+            feedback.classList.remove('hidden');
+
+            // Automatically move to next question
+            nextTimeout = setTimeout(() => {
+
+                currentQuestion++;
+
+                if (currentQuestion < questions.length) {
+
+                    renderQuestion();
+
+                } else {
+
+                    showResults();
+
+                }
+
+            }, 1200);
+
+        }
+
+
+        // ==========================================
+        // SHOW RESULTS
+        // ==========================================
+
+        function showResults() {
+
+            showScreen('resultScreen');
+
+            document.getElementById('finalScore').textContent =
+                score;
+
+            document.getElementById('resultBar').style.width =
+                `${score * 10}%`;
+
+            let title;
+            let description;
+            let icon;
+
+            if (score <= 4) {
+
+                title = 'Турист';
+
+                description =
+                    'Вы только начинаете открывать для себя вкусы Беларуси. Самое время перечитать буклет и отправиться в гастротур!';
+
+                icon = '🧳';
+
+            } else if (score <= 8) {
+
+                title = 'Знаток';
+
+                description =
+                    'Вы отлично ориентируетесь на гастрономической карте и точно отличите мачанку от клёцок!';
+
+                icon = '🥘';
+
+            } else {
+
+                title = 'Истинный белорус!';
+
+                description =
+                    'Вы — настоящий эксперт! Полесье, Витебщина и Гродненщина гордятся вами. Драники за наш счёт!';
+
+                icon = '🏆';
+
+            }
+
+            document.getElementById('resultTitle').textContent =
+                title;
+
+            document.getElementById('resultDescription').textContent =
+                description;
+
+            document.getElementById('resultIcon').textContent =
+                icon;
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+        }
+
+    </script>
+
+</body>
+</html>
